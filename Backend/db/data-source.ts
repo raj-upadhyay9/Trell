@@ -17,4 +17,5 @@ const AppDataSource = new DataSource({
     ssl:true
 })
 
+
 export default AppDataSource;

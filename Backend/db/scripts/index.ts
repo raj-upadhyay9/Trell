@@ -1,128 +1,23 @@
-import express, { Express, Request, Response } from 'express';
-import errorHandler from "errorhandler";
-import methodOverride from "method-override";
-import logger from "morgan";
-import jwt from 'jsonwebtoken';
-import { uid } from 'uid';
-import cors from "cors";
-
-import dotenv from 'dotenv';
-
-import AppDataSource from './db/data-source.js';
-import {Show} from './db/entities/Show.js';
-import {Person} from './db/entities/Person.js';
+import AppDataSource from '../data-source.js';
+import {Show} from '../entities/Show.js';
+import { Person } from '../entities/Person.js';
 
 
-dotenv.config();
 AppDataSource.initialize();
 
-const app: Express = express();
-const port = process.env.PORT || 3000;
+const sync = async () => await AppDataSource.synchronize();
+sync();
+
+const personRepo = AppDataSource.getRepository(Person);
+const showRepo = AppDataSource.getRepository(Show);
+
+const person1 = new Person();
+person1.id = "1a";
+person1.username = "test";
+person1.password = "asf;lkwje";
 
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(logger("dev"));
-app.use(methodOverride("_method"));
-app.use(errorHandler());
-
-const corsOptions = {
-  origin: "*",
-  optionsSuccessStatus : 200
-}
-
-app.use(cors<Request>(corsOptions));
-
-
-app.use((req, res, next) => {
-  if (req.path == '/login' || req.path == '/db') {
-    next();
-  } else { //login path
-    console.log('entered')
-    const token = req.headers['token'] as string;
-    console.log(token);
-    if (!token) {
-      console.log('no token');
-      return res.status(401).json({ message: 'No token provided' });
-    }
-
-    try {
-      console.log('here is some error');
-      const decoded = JSON.stringify(jwt.verify(token, !!process.env.JWT_SECRET ? process.env.JWT_SECRET : ""));
-      console.log(decoded,"decoded");
-      req.user = decoded;
-      next();
-    } catch (error) {
-      console.log("reaching error zone");
-      return res.status(401).json({ message: error });
-    }
-  }
-});
-
-app.get('/', (req: Request, res: Response) => {
-  res.send('Express + TypeScript Server is sending hello');
-});
-
-app.get('/data', async (req: Request, res: Response) => {
-  if (req.user) {
-    const user = JSON.parse(req.user);
-    const showRepo = AppDataSource.getRepository(Show);
-    console.log("reaching here");
-    var showsByUser = await showRepo
-    .createQueryBuilder("show")
-    .leftJoinAndSelect("show.person", "user")
-    .where("user.id = :userId", { userId: user.userId })
-    .getMany();
-      
-    const filteredShowByUser = showsByUser.map(item => {
-    const { person, ...rest } = item;
-    return rest;
-    });
-      
-    res.send(JSON.stringify(filteredShowByUser));
-    
-  }
-})
-
-app.post('/login',async (req: Request,res:Response) => {
-  const username = req.body.username;
-  const password = req.body.password;
-  console.log(req.body);
-  await AppDataSource.synchronize();
-
-  const personRepo = AppDataSource.getRepository(Person);
-  const user = await personRepo.findOneBy({ username: username });
-  console.log(password);
-  console.log(user?.password);
-  console.log(password);
-  if (user?.password === password) {
-    console.log('entered');
-    console.log("username", user?.username);
-    console.log("userId", user?.id);
-    console.log(process.env.JWT_SECRET);
-
-    var token = jwt.sign(JSON.stringify({ userId: user?.id, username: user?.username }), !!process.env.JWT_SECRET ? process.env.JWT_SECRET : "", { algorithm: "HS256" }
-    );
-
-    res.status(200).send({ auth: true, token: !!token ? token : "" });
-  }else{
-    res.send("wrong password");
-  }
-  
-})
-
-app.get('/db',async (req:Request,res:Response) => {
-  await AppDataSource.synchronize();
-
-  const personRepo = AppDataSource.getRepository(Person);
-  const showRepo = AppDataSource.getRepository(Show);
-
-  const person1 = new Person();
-  person1.id = "1a";
-  person1.username = "test";
-  person1.password = "asf;lkwje";
-
-  const show1 = new Show();
+const show1 = new Show();
 show1.id = 'asdwef;lk';
 show1.title = 'Stranger Things';
 show1.streamingApp = 'Hulu';
@@ -137,6 +32,7 @@ person2.id = "1c";
 person2.username = "test2";
 person2.password = "sdf;lkwe";
 
+personRepo.save(person2);
 
 const show2 = new Show();
 show2.id = 'asdfwe;lk';
@@ -403,7 +299,7 @@ show27.person = person2;
 showRepo.save(show27);
 
 const show28 = new Show();
-show28.id = 'qwertyuiofcp';
+show28.id = 'qwertyuiop';
 show28.title = 'The West Wing';
 show28.streamingApp = 'Netflix';
 show28.rating = 4.6;
@@ -431,10 +327,3 @@ show30.review = 'supernatural drama';
 show30.person = person1;
 
 showRepo.save(show30);
-
-  res.send(JSON.stringify(await showRepo.find({relations : {person : true}})));
-})
-
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
-});
