@@ -41,6 +41,7 @@ function Show({ show }) {
         </Card.Body>
       </Card>
       <ShowModal
+        create={false}
         watched={show}
         handleClose={handleClose}
         handleUpdate={handleUpdate}

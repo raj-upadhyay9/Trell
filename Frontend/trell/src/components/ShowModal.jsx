@@ -2,13 +2,17 @@ import React from "react";
 import ReactStars from "react-rating-stars-component";
 import { Modal, Button } from "react-bootstrap";
 
-const ShowModal = ({ watched, show, handleClose, handleUpdate }) => {
+const ShowModal = ({ create, watched, show, handleClose, handleUpdate }) => {
   const [series, setSeries] = React.useState({
     title: watched.title,
     streamingApp: watched.streamingApp,
     rating: watched.rating,
     review: watched.review,
   });
+
+  const [modalName, setModalName] = React.useState(
+    create ? "Create" : "Update"
+  );
 
   const handleChange = (name, value) => {
     setSeries({
@@ -25,7 +29,9 @@ const ShowModal = ({ watched, show, handleClose, handleUpdate }) => {
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>Update {series.title}</Modal.Title>
+        <Modal.Title>
+          {modalName} {series.title}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <form>
