@@ -4,7 +4,10 @@ import thunk from "redux-thunk";
 
 import { userLoginReducer } from "./reducers/userReducer";
 
+import { showListReducer } from "./reducers/showReducers";
+
 const reducer = combineReducers({
+  showList: showListReducer,
   userLogin: userLoginReducer,
 });
 

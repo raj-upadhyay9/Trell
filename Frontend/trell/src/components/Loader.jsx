@@ -5,15 +5,15 @@ function Loader() {
   return (
     <Spinner
       animation="border"
-      role="status"
       style={{
-        height: "100px",
-        width: "100px",
-        margin: "auto",
-        display: "block",
+        marginLeft: "5px",
+        display: "inline-block",
+        height: "15px",
+        width: "15px",
       }}
+      role="status"
     >
-      <span className="sr-only">Loading...</span>
+      <span className="visually-hidden">Loading...</span>
     </Spinner>
   );
 }

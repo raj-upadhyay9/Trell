@@ -34,36 +34,45 @@ function LoginScreen() {
   };
 
   return (
-    <FormContainer>
-      <h1>Sign In</h1>
-      {error && <Message variant="danger">{error}</Message>}
-      {loading && <Loader />}
-      <Form onSubmit={submitHandler}>
-        <Form.Group controlId="username">
-          <Form.Label>Username</Form.Label>
-          <Form.Control
-            type="username"
-            placeholder="Enter Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          ></Form.Control>
-        </Form.Group>
-
-        <Form.Group controlId="password">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            placeholder="Enter Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          ></Form.Control>
-        </Form.Group>
-
-        <Button type="submit" style={{ paddingTop: "5px" }} variant="primary">
-          Sign In
-        </Button>
-      </Form>
-    </FormContainer>
+    <div style={{ marginTop: "20vh" }}>
+      <FormContainer>
+        <h1>Sign In</h1>
+        {error && <Message variant="danger">{error}</Message>}
+        <Form onSubmit={submitHandler}>
+          <Form.Group controlId="username">
+            <Form.Label>Username</Form.Label>
+            <Form.Control
+              type="username"
+              placeholder="Enter Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            ></Form.Control>
+          </Form.Group>
+          <Form.Group controlId="password">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type="password"
+              placeholder="Enter Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            ></Form.Control>
+          </Form.Group>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-start",
+              alignItems: "center",
+              marginTop: "10px",
+            }}
+          >
+            <Button type="submit" variant="primary">
+              Sign In
+            </Button>
+            {loading && <Loader />}
+          </div>
+        </Form>
+      </FormContainer>
+    </div>
   );
 }
 
